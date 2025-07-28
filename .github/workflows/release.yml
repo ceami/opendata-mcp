@@ -29,6 +29,8 @@ jobs:
     permissions:
       contents: write
       id-token: write
+    environment:
+      name: github-release-and-pypi-publish
 
     steps:
       - name: Checkout code
@@ -78,8 +80,8 @@ jobs:
           files: |
             ./dist/*.whl
             ./dist/*.tar.gz
-  
-      - name: Publish to PyPI
+
+      - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
