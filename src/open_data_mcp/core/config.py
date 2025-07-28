@@ -12,10 +12,18 @@ class Settings(BaseSettings):
 
 
 def load_settings():
+    """Loads the settings from the command line arguments.
+
+    Returns:
+        Settings: The settings object.
+    """
     config_data = {}
-    parser = ArgumentParser(description="MCP 서버 Command Line 설정")
+    parser = ArgumentParser(description="MCP Server Command Line Settings")
     parser.add_argument(
-        "--data-portal-api-key", type=str, help="공공데이터포털 API 키", required=True
+        "--data-portal-api-key",
+        type=str,
+        help="Public Data Portal API Key",
+        required=True,
     )
     cli_args = parser.parse_args()
     if cli_args.data_portal_api_key is not None:

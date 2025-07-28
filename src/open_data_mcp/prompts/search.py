@@ -16,8 +16,9 @@ def search_api_usage_guide():
         해당 툴의 파라미터 중 query로 전달된 문자열이 포함된 제목을 가지고 있는 서비스를 최대 100개 반환합니다.
         사용자가 5자 이상의 공백이 포함된 데이터 요구를 하였을때는 그중 공백이 포함되지 않은 적절한 키워드를 선택하고
         선택한 공백이 미포함된 키워드를 search_api툴을 호출할 때 사용해야 연관 데이터를 원활하게 얻을 수 있습니다.
+        search_api 툴은 검색할 데이터의 키워드를 query 파라미터로 받고, 페이지 번호와 페이지 크기를 각각 page와 page_size 파라미터로 받습니다.
         [반환되는 데이터 예시] 
-        {"currentCount": 0, "data": [{
+        {"currentCount": 1, "data": [{
             "api_type": "REST",
             "category_nm": "교통및물류 > 철도",
             "core_data_nm": null,
@@ -99,7 +100,7 @@ def search_api_usage_guide():
             "updated_at": "2024-07-28T00:00:00",
             "upper_category_cd": "NB000120061201100059544",
             "use_prmisn_ennc": "없음",
-        }], "matchCount": 0, "page": 1, "perPage": 100, "totalCount": 16392}
+        }], "matchCount": 1, "page": 1, "perPage": 1, "totalCount": 1}
         "data" 키에 포함된 데이터에서 사용자가 요구한 데이터에 가장 일치하는 서비스를 제공하면 됨.
         데이터 하나 당 key를 30개 이상 가지고 있기 때문에 사용자에게 데이터를 제공할때에는 표로 정리해서 한눈에 알아볼 수 있게 정리하고
         is_deleted 와 is_list_deleted의 값이 Y 일 경우에는 데이터 선택 우선순위에서 후순위로 판단
