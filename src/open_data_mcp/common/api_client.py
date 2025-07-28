@@ -15,3 +15,10 @@ class ODCloudAPI:
                 params={"page": 1, "perPage": 100, "cond[title::LIKE]": query},
             ).json()
         )
+
+
+class API:
+    def __init__(self, base_url, api_key: str):
+        self.base_url = "https://api.odcloud.kr/api"
+        self.headers = {"Authorization": f"Infuser {api_key}"}
+        self.client = httpx.Client(headers=self.headers)
