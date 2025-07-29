@@ -1,6 +1,6 @@
 [project]
 name = "open-data-mcp"
-version = "0.1.3"
+version = "0.1.4"
 description = "공공 데이터 포털 API 검색 MCP"
 readme = "README.md"
 requires-python = ">=3.12"
