@@ -28,7 +28,7 @@ class APIInfo(BaseModel):
     api_type: str
     category_nm: str
     core_data_nm: str | None
-    created_at: datetime
+    created_at: datetime | None = Field(default=None)
     data_format: str
     dept_nm: str | None
     desc: str
@@ -72,7 +72,7 @@ class APIInfo(BaseModel):
     soap_url: str
     title: str
     title_en: str
-    updated_at: datetime
+    updated_at: datetime | None = Field(default=None)
     upper_category_cd: str
     use_prmisn_ennc: str
 
@@ -91,6 +91,13 @@ class APIInfo(BaseModel):
             str_list = v.split(",")
             v = [str.strip(item) for item in str_list]
         return v
+
+    @field_validator("created_at", "updated_at", mode="before")
+    @classmethod
+    def datetime_validator(cls, v: str):
+        if v:
+            return datetime.strptime(v, "%Y-%m-%d")
+        return None
 
 
 class PaginatedAPIList(PaginatedResponse):
