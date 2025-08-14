@@ -5,9 +5,17 @@ import open_data_mcp.prompts.search  # noqa: F401
 
 
 def main():
-    mcp.run(
-        transport=settings.transport, host=settings.host, port=settings.port, path="/"
-    )
+    if settings.transport == "stdio":
+        mcp.run(
+            transport=settings.transport,
+        )
+    else:
+        mcp.run(
+            transport=settings.transport,
+            host=settings.host,
+            port=settings.port,
+            path="/",
+        )
 
 
 if __name__ == "__main__":
