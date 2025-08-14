@@ -17,7 +17,7 @@ def main():
             transport=settings.transport,
             host=settings.host,
             port=settings.port,
-            path="/",
+            path=settings.path,
         )
 
 
