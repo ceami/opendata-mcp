@@ -6,12 +6,12 @@ from open_data_mcp.schemas import PaginatedDataList
 
 @mcp.tool()
 def search_api(
-    queries: list[str], page: int, page_size: int
+    query: list[str], page: int, page_size: int
 ) -> dict[str, PaginatedDataList]:
     """Returns a list of API services provided by the open data service that exactly match the input query.
 
     Args:
-        queries (list[str]): Searches for API services that exactly contain the queries.
+        query (list[str]): Searches for API services that exactly contain the queries.
         page (int): The page number of the returned PaginatedDataList.
         page_size (int): The page size of the returned PaginatedDataList.
 
@@ -19,7 +19,5 @@ def search_api(
         PaginatedDataList: A list of APIs matching the search criteria.
     """
     client = ODAPIClient()
-    results = {}
-    for query in queries:
-        results[query] = client.get_data_list(q=query, page=page, page_size=page_size)
+    results = client.get_data_list(query=query, page=page, page_size=page_size)
     return results
