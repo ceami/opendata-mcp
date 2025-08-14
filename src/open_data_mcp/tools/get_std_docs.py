@@ -1,6 +1,5 @@
 from open_data_mcp.common.api_client import ODAPIClient
 from open_data_mcp.core.server import mcp
-from open_data_mcp.core.config import settings
 from open_data_mcp.schemas import StdDocsInfo
 
 
