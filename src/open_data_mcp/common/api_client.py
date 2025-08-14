@@ -1,22 +1,15 @@
 import httpx
-from open_data_mcp.schemas import PaginatedAPIList
+from open_data_mcp.schemas import PaginatedDataList, StdDocsInfo
+from open_data_mcp.core.config import settings
 
 
-class ODCloudAPI:
-    """A client for the Public Data Utilization Support Center's list retrieval service."""
+class ODAPIClient:
+    def __init__(self):
+        self.base_url = settings.api_url
+        self.client = httpx.Client()
 
-    def __init__(self, api_key: str):
-        """Initializes the ODCloudAPI client.
-
-        Args:
-            api_key (str): The API key for the Public Data Utilization Support Center.
-        """
-        self.base_url = "https://api.odcloud.kr/api"
-        self.headers = {"Authorization": f"Infuser {api_key}"}
-        self.client = httpx.Client(headers=self.headers)
-
-    def get_api_list(self, query: str, page: int, page_size: int) -> PaginatedAPIList:
-        """Sends a GET request to search for API services using the Public Data Utilization Support Center's list retrieval service.
+    def get_data_list(self, q: str, page: int, page_size: int) -> PaginatedDataList:
+        """Sends a GET request to search for API services using the open data service.
 
         Args:
             query (str): The search keyword.
@@ -24,18 +17,23 @@ class ODCloudAPI:
             page_size (int): The number of items per page.
 
         Returns:
-            PaginatedAPIList: A list of APIs matching the search criteria.
+            PaginatedDataList: A list of data matching the search criteria.
         """
-        return PaginatedAPIList(
+        return PaginatedDataList(
             **self.client.get(
-                f"{self.base_url}/15077093/v1/open-data-list",
-                params={"page": page, "perPage": page_size, "cond[title::LIKE]": query},
+                f"{self.base_url}/api/v1/search/title",
+                params={"q": q, "page": page, "page_size": page_size},
             ).json()
         )
 
+    def get_std_docs(self, list_id: int) -> StdDocsInfo:
+        """Returns a standard document for the given list ID.
 
-class API:
-    def __init__(self, base_url: str, api_key: str):
-        self.base_url = base_url
-        self.headers = {"Authorization": f"Infuser {api_key}"}
-        self.client = httpx.Client(headers=self.headers)
+        Args:
+            list_id (int): The list ID of the data to get the standard document for.
+        """
+        return StdDocsInfo(
+            **self.client.get(
+                f"{self.base_url}/api/v1/document/std-docs/{list_id}"
+            ).json()
+        )
