@@ -8,11 +8,13 @@ class ODAPIClient:
         self.base_url = settings.api_url
         self.client = httpx.Client()
 
-    def get_data_list(self, q: str, page: int, page_size: int) -> PaginatedDataList:
+    def get_data_list(
+        self, query: list[str], page: int, page_size: int
+    ) -> PaginatedDataList:
         """Sends a GET request to search for API services using the open data service.
 
         Args:
-            query (str): The search keyword.
+            query (list[str]): The search keyword .
             page (int): The page number.
             page_size (int): The number of items per page.
 
@@ -22,7 +24,7 @@ class ODAPIClient:
         return PaginatedDataList(
             **self.client.get(
                 f"{self.base_url}/api/v1/search/title",
-                params={"q": q, "page": page, "page_size": page_size},
+                params={"q": query, "page": page, "page_size": page_size},
             ).json()
         )
 
