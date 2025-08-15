@@ -30,6 +30,8 @@ def call_openapi_endpoint(request_data: RequestData) -> dict | str:
       예: "headers": { "Authorization": "" }
     - 실제 키 값은 서버가 자동 주입합니다. 응답에 "SERVICE_KEY_IS_NOT_REGISTERED_ERROR"가 포함되면 활용신청을 진행하세요.
     - 실제 키 값은 서버가 자동 주입합니다. 응답에 "SERVICE_ACCESS_DENIED_ERROR"가 포함되면 활용신청을 진행하세요.
+    - 인증 키 값을 mcp 서버 실행시에 --service-key 옵션으로 전달하지 않았다면 이 도구에서는 serviceKey가 파라미터를 통해 요구되면 오류를 발생 시킵니다.
+    - 사용자에게 mcp server 실행시에 --service-key 옵션으로 전달하도록 안내하세요.
 
     호출 실패를 줄이기 위한 권장사항:
     - basePath와 path는 모두 선행 슬래시(`/`)를 포함해야 하며, host에는 프로토콜이나 슬래시를 넣지 마세요.
@@ -80,6 +82,10 @@ def call_openapi_endpoint(request_data: RequestData) -> dict | str:
     # 1. Check for serviceKey in query parameters
     for key, value in params.items():
         if "servicekey" in key.lower():
+            if settings.service_key is None:
+                return {
+                    "error": "serviceKey is not provided. Please provide serviceKey in the request or in the mcp server run command."
+                }
             params[key] = settings.service_key
             break
 
@@ -88,6 +94,10 @@ def call_openapi_endpoint(request_data: RequestData) -> dict | str:
         for key in list(headers.keys()):
             if "authorization" in key.lower():
                 # Assuming the key format is 'Infuser {key}' as is common in the platform
+                if settings.service_key is None:
+                    return {
+                        "error": "serviceKey is not provided. Please provide serviceKey in the request or in the mcp server run command."
+                    }
                 headers[key] = f"Infuser {settings.service_key}"
                 break
     # --- End of Injection Logic ---
