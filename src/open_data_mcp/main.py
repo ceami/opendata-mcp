@@ -1,7 +1,9 @@
 from open_data_mcp.core.server import mcp
 from open_data_mcp.core.config import settings
-import open_data_mcp.tools.search  # noqa: F401
-import open_data_mcp.prompts.search  # noqa: F401
+
+from open_data_mcp.tools import search_api, call_openapi_endpoint, get_std_docs
+
+tools = [search_api, call_openapi_endpoint, get_std_docs]
 
 
 def main():
@@ -14,7 +16,6 @@ def main():
             transport=settings.transport,
             host=settings.host,
             port=settings.port,
-            path="/",
         )
 
 

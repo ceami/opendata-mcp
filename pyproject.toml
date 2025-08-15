@@ -1,21 +1,23 @@
 [project]
 name = "open-data-mcp"
-version = "0.1.5"
+version = "0.1.6"
 description = "공공 데이터 포털 API 검색 MCP"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "argparse>=1.4.0",
     "fastmcp>=2.10.6",
-    "httpx>=0.28.1",
+    "httpx[http2]>=0.28.1",
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
+    "requests>=2.32.4",
 ]
 
 [dependency-groups]
 dev = [
+    "bs4>=0.0.2",
     "pyright>=1.1.403",
-    "ruff>=0.8.0"
+    "ruff>=0.8.0",
 ]
 
 [project.scripts]
