@@ -6,10 +6,10 @@ from argparse import ArgumentParser
 class Settings(BaseSettings):
     log_level: str = "INFO"
     transport: str = "stdio"
-    host: str = "0.0.0.0"
-    port: int = 8000
+    host: str = "127.0.0.1"
+    port: int = 80
     api_host: str = "mcp.dev.ezrnd.co.kr"
-    service_key: str
+    service_key: str | None = None
     model_config = ConfigDict(
         extra="ignore",
     )
@@ -45,7 +45,7 @@ def load_settings():
         "--service-key",
         type=str,
         help="Service key for the data.go.kr.",
-        required=True,
+        required=False,
     )
 
     cli_args = parser.parse_args()
