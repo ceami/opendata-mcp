@@ -5,7 +5,8 @@ from open_data_mcp.core.config import settings
 
 class ODAPIClient:
     def __init__(self):
-        self.base_url = settings.api_url
+        self.base_url = f"https://{settings.api_host}"
+        self.api_version_prefix = "/api/v1"
         self.client = httpx.Client()
 
     def get_data_list(
@@ -23,19 +24,19 @@ class ODAPIClient:
         """
         return PaginatedDataList(
             **self.client.get(
-                f"{self.base_url}/api/v1/search/title",
-                params={"q": query, "page": page, "page_size": page_size},
+                f"{self.base_url}{self.api_version_prefix}/search/title",
+                params={"query": query, "page": page, "page_size": page_size},
             ).json()
         )
 
-    def get_std_docs(self, list_id: int) -> StdDocsInfo:
+    def get_std_docs(self, list_id: list[int]) -> list[StdDocsInfo]:
         """Returns a standard document for the given list ID.
 
         Args:
-            list_id (int): The list ID of the data to get the standard document for.
+            list_id (list[int]): The list ID of the data to get the standard document for.
         """
-        return StdDocsInfo(
-            **self.client.get(
-                f"{self.base_url}/api/v1/document/std-docs/{list_id}"
-            ).json()
-        )
+        results = self.client.get(
+            f"{self.base_url}{self.api_version_prefix}/document/std-docs",
+            params={"list_ids": list_id, "page": 1, "page_size": len(list_id)},
+        ).json()
+        return [StdDocsInfo(**result) for result in results]
