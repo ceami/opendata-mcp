@@ -6,10 +6,10 @@ from argparse import ArgumentParser
 class Settings(BaseSettings):
     log_level: str = "INFO"
     transport: str = "stdio"
-    host: str = "127.0.0.1"
-    port: int = 3000
-    path: str = "/"
-    api_url: str
+    host: str = "0.0.0.0"
+    port: int = 8000
+    api_host: str = "mcp.dev.ezrnd.co.kr"
+    service_key: str
     model_config = ConfigDict(
         extra="ignore",
     )
@@ -42,15 +42,9 @@ def load_settings():
         required=False,
     )
     parser.add_argument(
-        "--path",
+        "--service-key",
         type=str,
-        help="Path for http/sse transport.",
-        required=False,
-    )
-    parser.add_argument(
-        "--api-url",
-        type=str,
-        help="API URL for the open data service.",
+        help="Service key for the data.go.kr.",
         required=True,
     )
 
@@ -61,10 +55,8 @@ def load_settings():
         config_data["host"] = cli_args.host
     if cli_args.port is not None:
         config_data["port"] = cli_args.port
-    if cli_args.path is not None:
-        config_data["path"] = cli_args.path
-    if cli_args.api_url is not None:
-        config_data["api_url"] = cli_args.api_url
+    if cli_args.service_key is not None:
+        config_data["service_key"] = cli_args.service_key
     return Settings(**config_data)
 
 

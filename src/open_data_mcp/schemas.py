@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, AliasGenerator, field_validator, Field
+from pydantic import BaseModel, ConfigDict, AliasGenerator, Field
 from pydantic.alias_generators import to_camel
 from typing import Literal, Any
 from datetime import datetime
@@ -22,22 +22,20 @@ class PaginatedResponse(BaseModelWithConfig):
     page_size: int
 
 
-class DataInfo(BaseModel):
+class DataInfo(BaseModelWithConfig):
     list_id: int
     list_title: str
-    title: str
     org_nm: str
-    score: float
     token_count: int
     has_generated_doc: bool
-    updated_at: datetime | None = Field(default=None)
+    updated_at: datetime | None
+    data_type: str
+    score: float
 
 
-class StdDocsInfo(BaseModel):
+class StdDocsInfo(BaseModelWithConfig):
     id: str
     list_id: int
-    title: str
-    description: str
     detail_url: str
     markdown: str
     llm_model: str
@@ -49,12 +47,12 @@ class PaginatedDataList(PaginatedResponse):
 
 
 # New schemas for generic API calls
-class BaseInfo(BaseModel):
+class BaseInfo(BaseModelWithConfig):
     host: str
     base_path: str
 
 
-class Param(BaseModel):
+class Param(BaseModelWithConfig):
     name: str
     description: str
     type: str
@@ -62,7 +60,7 @@ class Param(BaseModel):
     value: Any | None = None
 
 
-class EndpointInfo(BaseModel):
+class EndpointInfo(BaseModelWithConfig):
     path: str
     method: str
     params: list[Param] = []
@@ -70,7 +68,7 @@ class EndpointInfo(BaseModel):
     body: dict[str, Any] | None = None
 
 
-class RequestData(BaseModel):
+class RequestData(BaseModelWithConfig):
     base_info: BaseInfo
     endpoint_info: EndpointInfo
     request_parameters: dict[str, Any]
