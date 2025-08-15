@@ -1,18 +1,19 @@
 # Smithery configuration file: https://smithery.ai/docs/build/project-config
 
 startCommand:
-  type: http
+  type: stdio
   commandFunction:
     # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
     |-
-    (config) => ({ command: 'open-data-mcp', args: ['--transport', 'http', '--service-key', config.DataPortalApiKey], env: {} })
+    (config) => ({ command: 'open-data-mcp', args: ['--transport', 'http', '--host', '127.0.0.1', '--port', '80', '--service-key', config.dataPortalApiKey], env: {} })
   configSchema:
+    # JSON Schema defining the configuration options for the MCP.
     type: object
     required:
-      - DataPortalApiKey
+      - dataPortalApiKey
     properties:
-      DataPortalApiKey:
+      dataPortalApiKey:
         type: string
         description: 공공데이터포털 API 키
   exampleConfig:
-    DataPortalApiKey: YOUR_PUBLIC_DATA_PORTAL_API_KEY_HERE
+    dataPortalApiKey: YOUR_PUBLIC_DATA_PORTAL_API_KEY_HERE
