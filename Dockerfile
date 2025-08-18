@@ -11,6 +11,5 @@ COPY src ./src
 RUN pip install --no-cache-dir --upgrade pip \
   && pip install --no-cache-dir .
 
-ENV DATA_PORTAL_API_KEY=YOUR_ACTUAL_API_KEY
-
-ENTRYPOINT open-data-mcp --transport http --service-key "$DATA_PORTAL_API_KEY"
+ENTRYPOINT ["open-data-mcp"]
+CMD ["--transport", "http"]
