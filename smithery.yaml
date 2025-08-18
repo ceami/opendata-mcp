@@ -1,10 +1,10 @@
 startCommand:
-    type: http
-    configSchema:
-      type: object
-      required: ["ODP_SERVICE_KEY"]
-      properties:
-        ODP_SERVICE_KEY:
-          type: string
-          title: "Open Data Portal Service Key"
-          description: "Open Data Portal Service key for authentication."
+  type: http
+  configSchema:
+    type: object
+    required: ["ODP_SERVICE_KEY"]
+    properties:
+      ODP_SERVICE_KEY:
+        type: string
+        title: "Open Data Portal Service Key"
+        description: "Open Data Portal Service key for authentication."
