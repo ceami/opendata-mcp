@@ -1,14 +1,17 @@
 import requests
+from fastmcp import Context
 from open_data_mcp.core.server import mcp
 from open_data_mcp.core.config import settings
 from open_data_mcp.schemas import RequestData
 
 
 @mcp.tool()
-def call_openapi_endpoint(request_data: RequestData) -> dict | str:
+def call_openapi_endpoint(ctx: Context, request_data: RequestData) -> dict | str:
     """
     `call_openapi_endpoint` 도구는 제공된 OpenAPI 메타데이터를 기반으로 특정 엔드포인트에 API 요청을 보냅니다.
     이 도구를 사용하려면, API 호출에 필요한 모든 정보를 담은 단일 `request_data` 객체를 인자로 전달해야 합니다.
+    또한 ctx 객체를 통해 서버 설정을 전달받을 수 있습니다. 이 객체는 서버 설정을 포함하고 있으며, 이를 통해 서버 설정을 참조할 수 있습니다.
+    이 도구는 ctx.ODP_SERVICE_KEY 값을 통해 인증키를 주입합니다.
 
     RequestData 스키마(키 이름과 케이스에 주의: camelCase):
     1) baseInfo: API 기본 주소 정보
@@ -78,7 +81,8 @@ def call_openapi_endpoint(request_data: RequestData) -> dict | str:
     Returns:
         - dict: API의 응답(문자열 XML 또는 JSON). "SERVICE_KEY_IS_NOT_REGISTERED_ERROR"가 포함되면 활용신청 안내가 필요합니다.
     """
-
+    config = ctx.config
+    service_key = config.get("ODP_SERVICE_KEY") or settings.ODP_SERVICE_KEY
     # Properly construct the full URL: host + base_path + path
     endpoint_url = f"http://{request_data.base_info.host}{request_data.base_info.base_path}{request_data.endpoint_info.path}"
 
@@ -89,11 +93,11 @@ def call_openapi_endpoint(request_data: RequestData) -> dict | str:
     # 1. Check for serviceKey in query parameters
     for key, value in params.items():
         if "servicekey" in key.lower():
-            if settings.service_key is None:
+            if service_key is None:
                 return {
                     "error": "serviceKey is not provided. Please provide serviceKey in the request or in the mcp server run command."
                 }
-            params[key] = settings.service_key
+            params[key] = service_key
             break
 
     # 2. Check for serviceKey in headers (e.g., Authorization)
@@ -101,11 +105,11 @@ def call_openapi_endpoint(request_data: RequestData) -> dict | str:
         for key in list(headers.keys()):
             if "authorization" in key.lower():
                 # Assuming the key format is 'Infuser {key}' as is common in the platform
-                if settings.service_key is None:
+                if service_key is None:
                     return {
                         "error": "serviceKey is not provided. Please provide serviceKey in the request or in the mcp server run command."
                     }
-                headers[key] = f"Infuser {settings.service_key}"
+                headers[key] = f"Infuser {service_key}"
                 break
     # --- End of Injection Logic ---
 
