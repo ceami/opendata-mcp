@@ -1,4 +1,3 @@
-# Dockerfile 예시 - MCP 서버용
 FROM python:3.12-slim
 
 RUN apt-get update \
@@ -12,7 +11,6 @@ COPY src ./src
 RUN pip install --no-cache-dir --upgrade pip \
   && pip install --no-cache-dir .
 
-# 서비스 키 환경변수로 전달 (예: SMITHERY_SERVICE_KEY 사용)
-ENV SMITHERY_SERVICE_KEY=YOUR_SERVICE_KEY_HERE
+ENV DATA_PORTAL_API_KEY=YOUR_ACTUAL_API_KEY
 
-ENTRYPOINT ["open-data-mcp", "--transport", "http", "--service-key", "${SMITHERY_SERVICE_KEY}"]
+ENTRYPOINT open-data-mcp --transport http --service-key "$DATA_PORTAL_API_KEY"
