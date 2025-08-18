@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
     api_host: str = "mcp.dev.ezrnd.co.kr"
-    service_key: str | None = None
+    ODP_SERVICE_KEY: str | None = None
 
     model_config = SettingsConfigDict(
         extra="ignore",
@@ -55,34 +55,9 @@ def load_settings():
         help="stdio or http or sse.",
         required=False,
     )
-    parser.add_argument(
-        "--host",
-        type=str,
-        help="Host addr for http/sse transport.",
-        required=False,
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        help="Port for http/sse transport.",
-        required=False,
-    )
-    parser.add_argument(
-        "--service-key",
-        type=str,
-        help="Service key for the data.go.kr.",
-        required=False,
-    )
-
     cli_args = parser.parse_args()
     if cli_args.transport is not None:
         config_data["transport"] = cli_args.transport
-    if cli_args.host is not None:
-        config_data["host"] = cli_args.host
-    if cli_args.port is not None:
-        config_data["port"] = cli_args.port
-    if cli_args.service_key is not None:
-        config_data["service_key"] = cli_args.service_key
     return Settings(**config_data)
 
 

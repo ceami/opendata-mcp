@@ -1,15 +1,10 @@
-FROM python:3.12-slim
+# Use a Python image with uv pre-installed
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends build-essential \
-  && rm -rf /var/lib/apt/lists/*
+ADD . /app
 
 WORKDIR /app
-COPY pyproject.toml README.md ./
-COPY src ./src
+RUN uv sync && uv pip install -e .
 
-RUN pip install --no-cache-dir --upgrade pip \
-  && pip install --no-cache-dir .
-
-ENTRYPOINT ["open-data-mcp"]
+ENTRYPOINT ["uv", "run", "open-data-mcp"]
 CMD ["--transport", "http"]
