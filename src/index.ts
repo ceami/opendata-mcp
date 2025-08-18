@@ -1,8 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { registerCallOpenApiEndpoint } from "./tools/call_openapi_endpoints";
-import { registerSearchApi } from "./tools/search_api";
-import { registerGetStdDocs } from "./tools/get_std_docs";
+import { registerCallOpenApiEndpoint } from "./tools/call_openapi_endpoints.js";
+import { registerSearchApi } from "./tools/search_api.js";
+import { registerGetStdDocs } from "./tools/get_std_docs.js";
 
 export const configSchema = z.object({
     ODP_SERVICE_KEY: z

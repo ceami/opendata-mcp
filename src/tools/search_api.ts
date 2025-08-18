@@ -21,7 +21,7 @@ export function registerSearchApi(server: McpServer, apiHost: string) {
                 pageSize: z.number().describe("페이지 크기"),
             },
         },
-        async ({ query, page, pageSize }) => {
+        async ({ query, page, pageSize }: { query: string[]; page: number; pageSize: number }) => {
             const baseUrl = `https://${apiHost}/api/v1/search/title`;
             const usp = new URLSearchParams();
             for (const q of query) usp.append("query", q);

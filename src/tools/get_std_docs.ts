@@ -18,7 +18,7 @@ export function registerGetStdDocs(server: McpServer, apiHost: string) {
 - 반환 문서를 검토 후 call_openapi_endpoint에 필요한 파라미터를 구성하세요.`,
             inputSchema: { listId: z.array(z.number().describe("search_api 결과의 listId")) },
         },
-        async ({ listId }) => {
+        async ({ listId }: { listId: number[] }) => {
             const baseUrl = `https://${apiHost}/api/v1/document/std-docs`;
             const usp = new URLSearchParams();
             for (const id of listId) usp.append("list_ids", String(id));
@@ -33,9 +33,9 @@ export function registerGetStdDocs(server: McpServer, apiHost: string) {
             const docs = await (res as any).json();
             const parsed = z.array(StdDocsInfoSchema).safeParse(docs);
             const joined = parsed.success
-                ? parsed.data.map((d) => d.markdown).join("\n")
+                ? parsed.data.map((d: z.infer<typeof StdDocsInfoSchema>) => d.markdown).join("\n")
                 : Array.isArray(docs)
-                    ? (docs as any[]).map((d) => d?.markdown ?? "").join("\n")
+                    ? (docs as any[]).map((d: any) => d?.markdown ?? "").join("\n")
                     : String(docs);
             return { content: [{ type: "text", text: joined }] };
         }

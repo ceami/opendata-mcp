@@ -52,7 +52,7 @@ Example of the requestData:
         },
         async ({ requestData }: { requestData: z.infer<typeof RequestDataSchema> }) => {
             const serviceKey = getServiceKey();
-            const endpointUrl = `http://${requestData.baseInfo.host}${requestData.baseInfo.base_path}${requestData.endpointInfo.path}`;
+            const endpointUrl = `https://${requestData.baseInfo.host}${requestData.baseInfo.base_path}${requestData.endpointInfo.path}`;
             const method = requestData.endpointInfo.method.toUpperCase();
             const params: Array<z.infer<typeof ParamSchema>> = requestData.endpointInfo.params || [];
             const headers: Array<z.infer<typeof HeaderSchema>> = requestData.endpointInfo.headers || [];
@@ -103,11 +103,18 @@ Example of the requestData:
 
             try {
                 if (method === "GET") {
-                    const qs = buildQuery(params.reduce((acc, param) => {
-                        acc[param.name] = param.value;
+                    const queryParams = params.reduce((acc, param) => {
+                        if (param.value !== undefined && param.value !== null) acc[param.name] = param.value;
                         return acc;
-                    }, {} as Record<string, string>));
-                    const res = await withTimeout(fetch(`${endpointUrl}?${qs}`, { headers }), 30_000);
+                    }, {} as Record<string, string>);
+                    const qs = buildQuery(queryParams);
+
+                    const headerRecord = headers.reduce((acc, h) => {
+                        if (h.value !== undefined && h.value !== null) acc[h.name] = h.value;
+                        return acc;
+                    }, {} as Record<string, string>);
+
+                    const res = await withTimeout(fetch(`${endpointUrl}?${qs}`, { headers: headerRecord }), 30_000);
                     if (!(res as any).ok) {
                         return { content: [{ type: "text", text: `HTTP error occurred: ${(res as any).status} - ${await (res as any).text()}` }] };
                     }
@@ -117,10 +124,15 @@ Example of the requestData:
                         ? { content: [{ type: "text", text: JSON.stringify(body) }] }
                         : { content: [{ type: "text", text: String(body) }] };
                 } else if (method === "POST") {
+                    const headerRecord = headers.reduce((acc, h) => {
+                        if (h.value !== undefined && h.value !== null) acc[h.name] = h.value;
+                        return acc;
+                    }, {} as Record<string, string>);
+
                     const res = await withTimeout(
                         fetch(endpointUrl, {
                             method: "POST",
-                            headers: { "Content-Type": "application/json", ...headers },
+                            headers: { "Content-Type": "application/json", ...headerRecord },
                             body: JSON.stringify(requestData.endpointInfo.body || {}),
                         }),
                         30_000
