@@ -46,7 +46,8 @@ def search_api(query: list[str], page: int, page_size: int) -> PaginatedDataList
         }
         반환 데이터를 통해 관련 데이터를 찾아내는 것이 목적이므로 반환 데이터의 형식을 잘 파악하고 활용해야 합니다.
         반환 데이터 중에서 가장 알맞은 데이터를 찾으면 get_std_doc 도구를 이용하여 데이터 조회를 위한 사용정보를 담은 표준 문서를 요청합니다.
-        ** 절대로 임의 병렬 도구 호출을 진행하지 말고 리스트 형태로 query 파라미터를 전달하세
+        ** 절대로 임의 병렬 도구 호출을 진행하지 말고 리스트 형태로 query 파라미터를 전달하세요. **
+        ** 사용자가 요청한 데이터가 없다면 사용자에게 데이터가 없다는 것을 안내하고 도구 사용을 중단하세요. **
 
     Args:
         query (list[str]): Searches for API services that exactly contain the queries.
