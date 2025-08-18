@@ -1,4 +1,3 @@
-# smithery.yml 예시 - MCP 서버용
 startCommand:
   type: http
   commandFunction: |
@@ -11,14 +10,14 @@ startCommand:
       env: {}
     })
 
-  configSchema:
-    type: object
-    required:
-      - serviceKey
-    properties:
-      serviceKey:
-        type: string
-        description: 공공데이터포털 연결을 위한 서비스 키
+configSchema:
+  type: object
+  required:
+    - serviceKey
+  properties:
+    serviceKey:
+      type: string
+      description: 공공데이터포털 연결을 위한 서비스 키
 
-  exampleConfig:
-    serviceKey: "YOUR_SERVICE_KEY_HERE"
+exampleConfig:
+  serviceKey: "YOUR_SERVICE_KEY_HERE"
