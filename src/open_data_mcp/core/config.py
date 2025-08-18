@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     description: str
     log_level: str = "INFO"
     transport: str = "stdio"
-    host: str = "127.0.0.1"
+    host: str = "0.0.0.0"
     port: int = 8000
     api_host: str = "mcp.dev.ezrnd.co.kr"
     ODP_SERVICE_KEY: str | None = None
