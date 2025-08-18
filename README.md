@@ -1,4 +1,5 @@
 ## Open Data MCP
+[![smithery badge](https://smithery.ai/badge/@iosif2/opendata-mcp)](https://smithery.ai/server/@iosif2/opendata-mcp)
 
 한국 공공데이터포털(OpenAPI)을 더 쉽게 탐색·호출할 수 있도록 돕는 Model Context Protocol(MCP) 서버입니다. 다음과 같은 MCP 도구를 제공합니다:
 
