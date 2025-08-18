@@ -1,10 +1,9 @@
 startCommand:
-  type: http
+  type: stdio
   commandFunction: |
     (config) => ({
       command: 'open-data-mcp',
       args: [
-        '--transport', 'http',
         '--service-key', config.serviceKey
       ],
       env: {}
