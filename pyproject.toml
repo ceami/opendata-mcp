@@ -1,7 +1,7 @@
 [project]
 name = "open-data-mcp"
 version = "0.1.7"
-description = "공공 데이터 포털 API 검색 MCP"
+description = "Korean Public Data MCP. Query, analyze and report government datasets."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

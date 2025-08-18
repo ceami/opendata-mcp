@@ -1,6 +1,8 @@
 from fastmcp import FastMCP
+from open_data_mcp.core.config import settings
 
 mcp = FastMCP(
-    "open-data-mcp",
-    "공공 데이터 포털 API 검색 MCP공공 데이터 포털 API 검색 MCP",
+    name=settings.name,
+    version=settings.version,
+    instructions=settings.description,
 )
