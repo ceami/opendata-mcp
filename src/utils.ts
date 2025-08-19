@@ -28,9 +28,22 @@ export function buildQuery(params: Record<string, unknown>): string {
     return usp.toString();
 }
 export async function safeJson(res: Response | globalThis.Response): Promise<any | string> {
+    const response = res as globalThis.Response;
+    const rawText = await response.text();
+    const trimmed = rawText.trim();
+    if (trimmed.length === 0) return "";
     try {
-        return await (res as globalThis.Response).json();
+        const contentType = response.headers?.get?.("content-type") ?? "";
+        if (
+            contentType.includes("application/json") ||
+            contentType.includes("+json") ||
+            trimmed.startsWith("{") ||
+            trimmed.startsWith("[")
+        ) {
+            return JSON.parse(rawText);
+        }
     } catch {
-        return await (res as globalThis.Response).text();
+        // fall through and return raw text
     }
+    return rawText;
 }
