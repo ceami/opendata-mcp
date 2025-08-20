@@ -29,6 +29,35 @@ export const RequestDataSchema = z.object({
     endpointInfo: EndpointInfoSchema,
 }).describe("Request data of the API");
 
+// API 검색 결과 아이템 스키마
+export const SearchApiItemSchema = z.object({
+    list_id: z.number().describe("List ID of the API"),
+    list_title: z.string().describe("Advanced Title of the API"),
+    title: z.string().nullable().optional().describe("Title of the API"),
+    org_nm: z.string().nullable().optional().describe("Organization name"),
+    data_type: z.string().describe("Data type(FILE, API)"),
+    score: z.number().nullable().optional().describe("Search score"),
+    detail: z.object({
+        title: z.string().optional().describe("Detail title of the API"),
+        description: z.string().optional().describe("Detailed description of the API"),
+        endpoint: z.array(z.object({
+            title: z.string().optional().describe("Endpoint title"),
+            description: z.string().optional().describe("Endpoint description"),
+        })).optional().describe("API endpoints information"),
+    }).nullable().optional().describe("Additional detail information with structured format"),
+}).describe("Search API result item");
+
+// API 검색 결과 페이지네이션 스키마
+export const SearchApiPaginationSchema = z.object({
+    total: z.number().describe("Total number of results"),
+    page: z.number().describe("Current page number"),
+    pageSize: z.number().describe("Number of items per page"),
+    results: z.array(SearchApiItemSchema).describe("Array of search results"),
+}).describe("Search API pagination result");
+
+// API 검색 응답 스키마 (키워드별로 그룹화된 결과)
+export const SearchApiResponseSchema = z.record(z.string(), SearchApiPaginationSchema).describe("Search API response grouped by keywords");
+
 export const StdDocsInfoSchema = z.object({
     id: z.string().describe("ID of the standard document"),
     listId: z.number().describe("List ID of the standard document"),

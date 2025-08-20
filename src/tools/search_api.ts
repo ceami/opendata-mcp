@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { withTimeout } from "../utils.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { SearchApiResponseSchema } from "../types.js";
 
 export function registerSearchApi(server: McpServer, apiHost: string) {
     server.registerTool(
@@ -33,8 +34,39 @@ export function registerSearchApi(server: McpServer, apiHost: string) {
                 const text = await (res as any).text();
                 return { content: [{ type: "text", text: `HTTP error occurred: ${(res as any).status} - ${text}` }] };
             }
-            const data = await (res as any).json();
-            return { content: [{ type: "text", text: JSON.stringify(data) }] };
+            const rawData = await (res as any).json();
+
+            try {
+                const parsedData = SearchApiResponseSchema.parse(rawData);
+
+                const formattedResponse = Object.entries(parsedData).map(([keyword, pagination]) => ({
+                    keyword,
+                    total: pagination.total,
+                    page: pagination.page,
+                    pageSize: pagination.pageSize,
+                    results: pagination.results.map(item => ({
+                        list_id: item.list_id,
+                        list_title: item.list_title,
+                        title: item.title,
+                        org_nm: item.org_nm,
+                        data_type: item.data_type,
+                        score: item.score,
+                        detail: item.detail ? {
+                            title: item.detail.title,
+                            description: item.detail.description,
+                            endpoints: item.detail.endpoint?.map(ep => ({
+                                title: ep.title,
+                                description: ep.description
+                            }))
+                        } : null
+                    }))
+                }));
+
+                return { content: [{ type: "text", text: JSON.stringify(formattedResponse, null, 2) }] };
+            } catch (error) {
+                console.error("Failed to parse search API response:", error);
+                return { content: [{ type: "text", text: JSON.stringify(rawData, null, 2) }] };
+            }
         }
     );
 }
