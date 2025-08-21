@@ -29,6 +29,34 @@ export const RequestDataSchema = z.object({
     endpointInfo: EndpointInfoSchema,
 }).describe("Request data of the API");
 
+// API 검색 결과 아이템 스키마
+export const SearchApiItemSchema = z.object({
+    listId: z.number().describe("List ID of the API"),
+    listTitle: z.string().describe("Advanced Title of the API"),
+    title: z.string().nullable().optional().describe("Title of the API"),
+    orgNm: z.string().nullable().optional().describe("Organization name"),
+    dataType: z.string().describe("Data type(FILE, API)"),
+    score: z.number().nullable().optional().describe("Search score"),
+    detail: z.object({
+        title: z.string().optional().describe("Detail title of the API"),
+        description: z.string().optional().describe("Detailed description of the API"),
+        endpoint: z.array(z.object({
+            title: z.string().optional().describe("Endpoint title"),
+            description: z.string().optional().describe("Endpoint description"),
+        })).optional().describe("API endpoints information"),
+    }).nullable().optional().describe("Additional detail information with structured format"),
+}).describe("Search API result item");
+
+// API 검색 결과 페이지네이션 스키마
+export const SearchApiPaginationSchema = z.object({
+    total: z.number().describe("Total number of results"),
+    page: z.number().describe("Current page number"),
+    pageSize: z.number().describe("Number of items per page"),
+    results: z.array(SearchApiItemSchema).describe("Array of search results"),
+}).describe("Search API pagination result");
+
+export const SearchApiResponseSchema = SearchApiPaginationSchema.describe("Search API response with pagination");
+
 export const StdDocsInfoSchema = z.object({
     id: z.string().describe("ID of the standard document"),
     listId: z.number().describe("List ID of the standard document"),
