@@ -31,11 +31,11 @@ export const RequestDataSchema = z.object({
 
 // API 검색 결과 아이템 스키마
 export const SearchApiItemSchema = z.object({
-    list_id: z.number().describe("List ID of the API"),
-    list_title: z.string().describe("Advanced Title of the API"),
+    listId: z.number().describe("List ID of the API"),
+    listTitle: z.string().describe("Advanced Title of the API"),
     title: z.string().nullable().optional().describe("Title of the API"),
-    org_nm: z.string().nullable().optional().describe("Organization name"),
-    data_type: z.string().describe("Data type(FILE, API)"),
+    orgNm: z.string().nullable().optional().describe("Organization name"),
+    dataType: z.string().describe("Data type(FILE, API)"),
     score: z.number().nullable().optional().describe("Search score"),
     detail: z.object({
         title: z.string().optional().describe("Detail title of the API"),

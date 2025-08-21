@@ -44,16 +44,16 @@ export function registerSearchApi(server: McpServer, apiHost: string) {
                     page: parsedData.page,
                     pageSize: parsedData.pageSize,
                     results: parsedData.results.map(item => ({
-                        list_id: item.list_id,
-                        list_title: item.list_title,
+                        listId: item.list_id,
+                        listTitle: item.list_title,
                         title: item.title,
-                        org_nm: item.org_nm,
-                        data_type: item.data_type,
+                        orgNm: item.org_nm,
+                        dataType: item.data_type,
                         score: item.score,
                         detail: item.detail ? {
                             title: item.detail.title,
                             description: item.detail.description,
-                            endpoints: item.detail.endpoint?.map(ep => ({
+                            endpoint: item.detail.endpoint?.map(ep => ({
                                 title: ep.title,
                                 description: ep.description
                             }))
