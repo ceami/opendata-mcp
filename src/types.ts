@@ -55,8 +55,7 @@ export const SearchApiPaginationSchema = z.object({
     results: z.array(SearchApiItemSchema).describe("Array of search results"),
 }).describe("Search API pagination result");
 
-// API 검색 응답 스키마 (키워드별로 그룹화된 결과)
-export const SearchApiResponseSchema = z.record(z.string(), SearchApiPaginationSchema).describe("Search API response grouped by keywords");
+export const SearchApiResponseSchema = SearchApiPaginationSchema.describe("Search API response with pagination");
 
 export const StdDocsInfoSchema = z.object({
     id: z.string().describe("ID of the standard document"),

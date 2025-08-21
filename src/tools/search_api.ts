@@ -39,12 +39,11 @@ export function registerSearchApi(server: McpServer, apiHost: string) {
             try {
                 const parsedData = SearchApiResponseSchema.parse(rawData);
 
-                const formattedResponse = Object.entries(parsedData).map(([keyword, pagination]) => ({
-                    keyword,
-                    total: pagination.total,
-                    page: pagination.page,
-                    pageSize: pagination.pageSize,
-                    results: pagination.results.map(item => ({
+                const formattedResponse = {
+                    total: parsedData.total,
+                    page: parsedData.page,
+                    pageSize: parsedData.pageSize,
+                    results: parsedData.results.map(item => ({
                         list_id: item.list_id,
                         list_title: item.list_title,
                         title: item.title,
@@ -60,8 +59,8 @@ export function registerSearchApi(server: McpServer, apiHost: string) {
                             }))
                         } : null
                     }))
-                }));
-
+                };
+                
                 return { content: [{ type: "text", text: JSON.stringify(formattedResponse, null, 2) }] };
             } catch (error) {
                 console.error("Failed to parse search API response:", error);
