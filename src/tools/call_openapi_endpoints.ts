@@ -1,3 +1,18 @@
+/*
+ * Copyright 2025 Team Aeris
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { withTimeout, buildQuery, safeJson } from "../utils.js";
 import { HeaderSchema, ParamSchema, RequestDataSchema } from "../types.js";
@@ -56,32 +71,6 @@ Example of the requestData:
             const method = requestData.endpointInfo.method.toUpperCase();
             const params: Array<z.infer<typeof ParamSchema>> = requestData.endpointInfo.params || [];
             const headers: Array<z.infer<typeof HeaderSchema>> = requestData.endpointInfo.headers || [];
-            // Example of the data 
-            /*
-            "params": [
-                {
-                "name": "serviceKey",
-                "value": ""
-                },
-                {
-                "name": "base_date",
-                "value": "20240611"
-                },
-                {
-                "name": "base_time",
-                "value": "1200"
-                },
-                {
-                "name": "beach_num",
-                "value": "1"
-                }
-            ]
-        Get the value of the param from the requestData.endpointInfo.params
-        name is the key of the param
-        value is the value of the param
-        if the value is not provided, the param is not included in the query string
-            */
-            // Inject service key into query params if a param name contains 'servicekey'
             for (const param of params) {
                 if (param.name.toLowerCase().includes("servicekey")) {
                     if (!serviceKey) {
