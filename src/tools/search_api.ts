@@ -44,11 +44,11 @@ export function registerSearchApi(server: McpServer, apiHost: string) {
                     page: parsedData.page,
                     pageSize: parsedData.pageSize,
                     results: parsedData.results.map(item => ({
-                        listId: item.list_id,
-                        listTitle: item.list_title,
+                        listId: item.listId,
+                        listTitle: item.listTitle,
                         title: item.title,
-                        orgNm: item.org_nm,
-                        dataType: item.data_type,
+                        orgNm: item.orgNm,
+                        dataType: item.dataType,
                         score: item.score,
                         detail: item.detail ? {
                             title: item.detail.title,
