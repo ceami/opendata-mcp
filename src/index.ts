@@ -33,7 +33,7 @@ export default function createStatelessServer({ config }: { config: ServerConfig
         name: "Open Data MCP",
         version: "1.0.0",
     });
-    const apiHost = "mcp.dev.ezrnd.co.kr";
+    const apiHost = "mcp.ezrnd.co.kr";
     const serviceKey = config.ODP_SERVICE_KEY;
 
     registerSearchApi(server, apiHost);
