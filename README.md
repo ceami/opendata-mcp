@@ -5,9 +5,9 @@
 
 - **search_api**: 키워드로 공공데이터 API를 검색
 - **get_std_docs**: 검색 결과에서 선택한 `listId` 목록으로 표준 문서(markdown) 병합
-- **call_openapi_endpoint**: 표준 문서/메타데이터를 바탕으로 실제 OpenAPI 엔드포인트 호출
+- **fetch_data**: 표준 문서/메타데이터를 바탕으로 실제 OpenAPI 엔드포인트 호출
 
-내부적으로 검색/문서 도구는 `mcp.dev.ezrnd.co.kr`(HTTPS) 백엔드를 사용합니다.
+내부적으로 검색/문서 도구는 `mcp.ezrnd.co.kr`(HTTPS) 백엔드를 사용합니다.
 
 ### 요구 사항
 - Node.js ≥ 18.17 (권장: 최신 LTS)
@@ -49,7 +49,7 @@ npm run dev
   - `listId`: number[]
 - **출력**: 통합된 markdown 문자열
 
-#### call_openapi_endpoint
+#### fetch_data
 - **설명**: OpenAPI 메타데이터를 기반으로 특정 엔드포인트를 호출합니다. 기본 프로토콜은 HTTPS입니다.
 - **입력**: `requestData`
   - `baseInfo.host`: 예) `apis.data.go.kr` (프로토콜/슬래시 금지)
