@@ -65,8 +65,8 @@ export function registerFetchDataTool(server: McpServer, getServiceKey: () => st
 
                     const res = await withTimeout(fetch(`${endpointUrl}?${qs}`, { headers: headerRecord }), 30_000);
                     if (!(res as any).ok) {
-                        logger.error(`HTTP error occurred: ${(res as any).status} - ${await (res as any).text()}`);
-                        return { content: [{ type: "text", text: `HTTP error occurred: ${(res as any).status} - ${await (res as any).text()}` }] };
+                        logger.error(`HTTP error occurred: ${(res as any).status}`);
+                        return { content: [{ type: "text", text: `HTTP error occurred: ${(res as any).status}` }] };
                     }
                     const body = await safeJson(res as any);
                     const isJson = typeof body === "object";
