@@ -15,34 +15,45 @@
  */
 import { z } from "zod";
 
+
+export const searchApiInputSchema = {
+    query: z.array(z.string().describe("Keyword string(No spaces)")).describe("Array of keywords").max(5),
+    page: z.number().describe("Page number(1-based)").min(1),
+    pageSize: z.number().describe("Page size").min(1).max(100),
+};
+
+export const getStdDocsInputSchema = {
+    listId: z.array(z.number().describe("listId returned from search_api")).min(1).max(10).describe("Array of listId"),
+};
+
 export const BaseInfoSchema = z.object({
-    host: z.string().describe("Host name of the API"),
+    host: z.string().describe("Host name of the API(No protocol or slash)"),
     base_path: z.string().describe("Base path of the API(Start with '/' as a root)"),
-}).describe("Base information of the API");
+}).describe("Base Connection information of the API");
 
 export const ParamSchema = z.object({
-    name: z.string().describe("Name of the parameter"),
-    value: z.string().nullable().optional().describe("Value of the parameter(Accepts string only)"),
-}).describe("Parameter information");
+    name: z.string().describe("Name of the parameter(No spaces)"),
+    value: z.string().nullable().optional().describe("Value of the parameter"),
+}).describe("Parameter information of the API to fetch data, if serviceKey is required, it will be automatically filled so you need to provide empty string as a value");
 
 export const HeaderSchema = z.object({
-    name: z.string().describe("Name of the header"),
-    prefix: z.string().describe("Prefix of the header"),
+    name: z.string().describe("Name of the header(No spaces)"),
+    prefix: z.string().describe("Prefix of the header(e.g. Infuser, Bearer)"),
     value: z.string().describe("Value of the header(Accepts string only)"),
-}).describe("Header information");
+}).describe("Header information of the API to fetch data, if serviceKey is required, it will be automatically filled so you need to provide empty string as a value and put the prefix of the header(e.g. Infuser, Bearer) in the prefix field");
 
 export const EndpointInfoSchema = z.object({
     path: z.string().describe("Path of the API(Start with '/' as a root)"),
-    method: z.string().describe("Method of the API(GET, POST, PUT, DELETE)"),
-    params: z.array(ParamSchema).default([]).optional().describe("Parameters of the API(Replace the values with corresponding values)"),
-    headers: z.array(HeaderSchema).default([]).optional().describe("Headers of the API(Replace the values with corresponding values)"),
-    body: z.record(z.string(), z.any()).optional().describe("Body of the API(Replace the values with corresponding values)"),
-}).describe("Endpoint information of the API");
+    method: z.enum(["GET", "POST", "PUT", "DELETE"]).describe("Method of the API Now only GET is supported"),
+    params: z.array(ParamSchema).default([]).optional().describe("Parameters of the API(Check the information of ParamSchema)"),
+    headers: z.array(HeaderSchema).default([]).optional().describe("Headers of the API(Check the information of HeaderSchema)"),
+    body: z.record(z.string(), z.any()).optional().describe("Body of the API Not supported yet"),
+}).describe("Endpoint information of the API to fetch data");
 
-export const RequestDataSchema = z.object({
+export const FetchDataInputSchema = {
     baseInfo: BaseInfoSchema,
     endpointInfo: EndpointInfoSchema,
-}).describe("Request data of the API");
+};
 
 // API 검색 결과 아이템 스키마
 export const SearchApiItemSchema = z.object({

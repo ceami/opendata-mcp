@@ -15,14 +15,15 @@
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { registerCallOpenApiEndpoint } from "./tools/call_openapi_endpoints.js";
-import { registerSearchApi } from "./tools/search_api.js";
-import { registerGetStdDocs } from "./tools/get_std_docs.js";
+import { registerFetchDataTool } from "./tools/fetch_data.js";
+import { registerSearchApiTool } from "./tools/search_api.js";
+import { registerGetStdDocsTool } from "./tools/get_std_docs.js";
+import { logger } from "./logger.js";
 
 export const configSchema = z.object({
     ODP_SERVICE_KEY: z
         .string()
-        .describe("Public data service key for authenticated requests")
+        .describe("Service key for Open Data Portal(공공데이터포털) for authenticated requests while using fetch_data tool.(If serviceKey is not provided, only No-Auth API is supported.)")
         .optional()
 });
 
@@ -31,16 +32,23 @@ type ServerConfig = z.infer<typeof configSchema>;
 export default function createStatelessServer({ config }: { config: ServerConfig }) {
     const server = new McpServer({
         name: "Open Data MCP",
-        version: "1.0.0",
+        version: "1.0.1",
     });
     const apiHost = "mcp.ezrnd.co.kr";
     const serviceKey = config.ODP_SERVICE_KEY;
 
-    registerSearchApi(server, apiHost);
-    registerGetStdDocs(server, apiHost);
-    registerCallOpenApiEndpoint(server, () => {
+
+
+
+
+    logger.info("Registering tools...");
+    registerSearchApiTool(server, apiHost);
+    registerGetStdDocsTool(server, apiHost);
+    registerFetchDataTool(server, () => {
         return serviceKey || undefined;
     });
+
+    logger.info("Tools registered successfully");
 
     return server.server;
 }
