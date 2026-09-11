@@ -28,7 +28,7 @@ export const getStdDocsInputSchema = {
 
 export const BaseInfoSchema = z.object({
     host: z.string().describe("Host name of the API(No protocol or slash)"),
-    base_path: z.string().describe("Base path of the API(Start with '/' as a root)"),
+    base_path: z.string().startsWith("/").describe("Base path of the API(Start with '/' as a root)"),
 }).describe("Base Connection information of the API");
 
 export const ParamSchema = z.object({
@@ -43,8 +43,8 @@ export const HeaderSchema = z.object({
 }).describe("Header information of the API to fetch data, if serviceKey is required, it will be automatically filled so you need to provide empty string as a value and put the prefix of the header(e.g. Infuser, Bearer) in the prefix field");
 
 export const EndpointInfoSchema = z.object({
-    path: z.string().describe("Path of the API(Start with '/' as a root)"),
-    method: z.enum(["GET", "POST", "PUT", "DELETE"]).describe("Method of the API Now only GET is supported"),
+    path: z.string().startsWith("/").describe("Path of the API(Start with '/' as a root)"),
+    method: z.literal("GET").describe("Method of the API(Currently only GET is supported)"),
     params: z.array(ParamSchema).default([]).optional().describe("Parameters of the API(Check the information of ParamSchema)"),
     headers: z.array(HeaderSchema).default([]).optional().describe("Headers of the API(Check the information of HeaderSchema)"),
     body: z.record(z.string(), z.any()).optional().describe("Body of the API Not supported yet"),

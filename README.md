@@ -10,8 +10,8 @@
 내부적으로 검색/문서 도구는 `mcp.ezrnd.co.kr`(HTTPS) 백엔드를 사용합니다.
 
 ### 요구 사항
-- Node.js ≥ 18.17 (권장: 최신 LTS)
-- npm (패키지 매니저)
+- Docker 또는 Node.js 최신 LTS
+- npm
 
 ### 설치
 ```bash
@@ -19,19 +19,31 @@ npm install
 ```
 
 ### 실행(개발)
-Smithery CLI를 사용해 MCP 개발 서버를 구동할 수 있습니다.
-
 ```bash
 npm run dev
 ```
 
-> 참고: `@smithery/cli`가 MCP 호스트 역할을 하며, 테스트 환경에서는 기능 미지원으로 인해 `ODP_SERVICE_KEY`주입이 불가능합니다
-> 추후 환경변수 등으로 사전 주입하여 서버를 실행할 수 있게 수정 예정
+MCP 엔드포인트는 `http://localhost:8787/mcp`, 상태 확인은 `http://localhost:8787/health`입니다.
 
-### 환경변수
-- **ODP_SERVICE_KEY**: 공공데이터포털 서비스 키. 일부 API는 쿼리 파라미터 또는 Authorization 헤더로 키 주입이 필요합니다.
+### Docker 배포
+```bash
+docker compose up -d --build
+docker compose ps
+```
+
+Compose 파일은 프록시 네트워크를 지정하지 않습니다. 컨테이너를 프록시 네트워크에 연결한 뒤 `opendata-mcp:8787`의 `/mcp`로 프록시하세요.
+외부 공개 시 인증과 요청 빈도 제한은 리버스 프록시에서 적용하세요. 애플리케이션은 MCP 요청 본문을 1 MiB로 제한합니다.
+
+Smithery에는 공개 Streamable HTTP URL(예: `https://mcp.ezrnd.co.kr/mcp`)을 등록합니다. 기존 `smithery.yaml` 기반 호스팅과 구형 `@smithery/cli` 실행 경로는 사용하지 않습니다.
+
+### 설정
+- **PORT**: HTTP 포트. 기본값은 `8787`입니다.
+- **MCP_ALLOWED_HOSTS**: MCP 요청에 허용할 `Host` 헤더의 쉼표 구분 목록입니다. 기본값은 `mcp.ezrnd.co.kr`과 로컬 개발 호스트입니다.
+- **ODP_ALLOWED_HOSTS**: `fetch_data`가 호출할 수 있는 API 호스트의 쉼표 구분 목록입니다. 기본값은 `apis.data.go.kr,api.odcloud.kr`입니다.
+- **x-odp-service-key** 요청 헤더: 공공데이터포털 서비스 키. 서버 공용 환경변수로 저장하지 않고 MCP 요청별로 전달합니다.
   - 파라미터 이름에 `serviceKey`가 포함되어 있으면 자동 주입됩니다.
-  - 헤더 이름에 `Authorization`이 포함되어 있으면 `{Prefix} {키}` 형식으로 자동 주입됩니다.
+  - 헤더 이름이 `Authorization`이면 `{Prefix} {키}` 형식으로 자동 주입됩니다.
+  - 키와 Authorization 값은 로그에 기록하지 않으며, 허용된 API 호스트에만 전송됩니다.
 
 ### 제공 도구 상세
 
@@ -55,12 +67,10 @@ npm run dev
   - `baseInfo.host`: 예) `apis.data.go.kr` (프로토콜/슬래시 금지)
   - `baseInfo.base_path`: 예) `/B552015/NpsBplcInfoInqireServiceV2`
   - `endpointInfo.path`: 예) `/getBassInfoSearchV2`
-  - `endpointInfo.method`: `GET` 또는 `POST`
+  - `endpointInfo.method`: `GET`
   - `endpointInfo.params`: `[{ name, value }]` 배열. 값이 없으면 제외됩니다.
   - `endpointInfo.headers`: `[{ name, prefix, value }]` 배열. `Authorization`에 서비스키 자동 주입 지원.
-  - `endpointInfo.body`: POST 본문(JSON)
 - **출력**: 응답 본문(JSON 문자열 또는 텍스트)
 
 ### 라이선스
 이 저장소의 라이선스는 루트의 `LICENSE` 파일을 참고하세요.
-

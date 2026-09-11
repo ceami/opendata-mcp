@@ -14,13 +14,69 @@
  * limitations under the License.
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { withTimeout, buildQuery, safeJson } from "../utils.js";
-import { HeaderSchema, ParamSchema, FetchDataInputSchema, BaseInfoSchema, EndpointInfoSchema } from "../types.js";
+import { buildQuery, safeJson } from "../utils.js";
+import { FetchDataInputSchema, BaseInfoSchema, EndpointInfoSchema } from "../types.js";
 import { z } from "zod";
 import { logger } from "../logger.js";
 
+type BaseInfo = z.infer<typeof BaseInfoSchema>;
+type EndpointInfo = z.infer<typeof EndpointInfoSchema>;
 
-export function registerFetchDataTool(server: McpServer, getServiceKey: () => string | undefined) {
+const DEFAULT_ALLOWED_API_HOSTS = ["apis.data.go.kr", "api.odcloud.kr"];
+
+function getAllowedApiHosts() {
+    return new Set(
+        (process.env.ODP_ALLOWED_HOSTS?.split(",") ?? DEFAULT_ALLOWED_API_HOSTS)
+            .map((host) => host.trim().toLowerCase())
+            .filter(Boolean),
+    );
+}
+
+export function buildFetchRequest(
+    baseInfo: BaseInfo,
+    endpointInfo: EndpointInfo,
+    serviceKey: string | undefined,
+    allowedHosts: ReadonlySet<string>,
+) {
+    const host = baseInfo.host.trim().toLowerCase();
+    if (!allowedHosts.has(host)) {
+        throw new Error(`API host is not allowed: ${host}`);
+    }
+    if (!baseInfo.base_path.startsWith("/") || !endpointInfo.path.startsWith("/")) {
+        throw new Error("API paths must start with '/'");
+    }
+
+    const url = new URL(`https://${host}`);
+    url.pathname = `${baseInfo.base_path.replace(/\/$/, "")}${endpointInfo.path}`;
+    const queryParams = Object.fromEntries(
+        (endpointInfo.params ?? [])
+            .map((param) => [
+                param.name,
+                param.name.toLowerCase().includes("servicekey") ? serviceKey : param.value,
+            ])
+            .filter((entry): entry is [string, string] => entry[1] !== undefined && entry[1] !== null),
+    );
+    url.search = buildQuery(queryParams);
+
+    let authorizationInjected = false;
+    const headers = Object.fromEntries(
+        (endpointInfo.headers ?? []).map((header) => {
+            if (!authorizationInjected && serviceKey && header.name.toLowerCase() === "authorization") {
+                authorizationInjected = true;
+                return [header.name, `${header.prefix} ${serviceKey}`];
+            }
+            return [header.name, header.value];
+        }),
+    );
+
+    return { url, headers, redirect: "error" as const };
+}
+
+export function registerFetchDataTool(
+    server: McpServer,
+    getServiceKey: () => string | undefined,
+    allowedHosts = getAllowedApiHosts(),
+) {
     server.registerTool(
         "fetch_data",
         {
@@ -28,59 +84,32 @@ export function registerFetchDataTool(server: McpServer, getServiceKey: () => st
             description: `Fetch data from the API.(Base on information of get_std_docs tool)`,
             inputSchema: FetchDataInputSchema
         },
-        async ({ baseInfo, endpointInfo }: { baseInfo: z.infer<typeof BaseInfoSchema>, endpointInfo: z.infer<typeof EndpointInfoSchema> }) => {
+        async ({ baseInfo, endpointInfo }: { baseInfo: BaseInfo, endpointInfo: EndpointInfo }) => {
             logger.info(`Fetching data from ${baseInfo.host}${baseInfo.base_path}${endpointInfo.path}`);
             const serviceKey = getServiceKey();
-            const endpointUrl = `https://${baseInfo.host}${baseInfo.base_path}${endpointInfo.path}`;
-            const method = endpointInfo.method.toUpperCase();
-            const params: Array<z.infer<typeof ParamSchema>> = endpointInfo.params || [];
-            const headers: Array<z.infer<typeof HeaderSchema>> = endpointInfo.headers || [];
-            for (const param of params) {
-                if (param.name.toLowerCase().includes("servicekey")) {
-                    param.value = serviceKey;
-                }
-            }
-
-            for (const header of headers) {
-                if (header.name.toLowerCase().includes("authorization")) {
-                    header.value = `${header.prefix} ${serviceKey}`;
-                    break;
-                }
-            }
 
             try {
-                if (method === "GET") {
-                    const queryParams = params.reduce((acc, param) => {
-                        if (param.value !== undefined && param.value !== null) acc[param.name] = param.value;
-                        logger.info(`Query parameter: ${param.name} = ${param.value}`);
-                        return acc;
-                    }, {} as Record<string, string>);
-                    const qs = buildQuery(queryParams);
-
-                    const headerRecord = headers.reduce((acc, h) => {
-                        if (h.value !== undefined && h.value !== null) acc[h.name] = h.value;
-                        logger.info(`Header: ${h.name} = ${h.value}`);
-                        return acc;
-                    }, {} as Record<string, string>);
-
-                    const res = await withTimeout(fetch(`${endpointUrl}?${qs}`, { headers: headerRecord }), 30_000);
-                    if (!(res as any).ok) {
-                        logger.error(`HTTP error occurred: ${(res as any).status}`);
-                        return { content: [{ type: "text", text: `HTTP error occurred: ${(res as any).status}` }] };
-                    }
-                    const body = await safeJson(res as any);
-                    const isJson = typeof body === "object";
-                    logger.info(`Fetch data response: ${JSON.stringify(body)}`);
-                    return isJson
-                        ? { content: [{ type: "text", text: JSON.stringify(body) }] }
-                        : { content: [{ type: "text", text: String(body) }] };
-                } else {
-                    logger.error(`Unsupported HTTP method: ${method}`);
-                    return { content: [{ type: "text", text: `Unsupported HTTP method: ${method}` }] };
+                const request = buildFetchRequest(baseInfo, endpointInfo, serviceKey, allowedHosts);
+                const res = await fetch(request.url, {
+                    headers: request.headers,
+                    redirect: request.redirect,
+                    signal: AbortSignal.timeout(30_000),
+                });
+                if (!res.ok) {
+                    logger.error(`HTTP error occurred: ${res.status}`);
+                    return { content: [{ type: "text", text: `HTTP error occurred: ${res.status}` }] };
                 }
+                const body = await safeJson(res);
+                return typeof body === "object"
+                    ? { content: [{ type: "text", text: JSON.stringify(body) }] }
+                    : { content: [{ type: "text", text: String(body) }] };
             } catch (e: any) {
-                logger.error(`An error occurred while requesting: ${e?.message || e}`);
-                return { content: [{ type: "text", text: `An error occurred while requesting: ${e?.message || e}` }] };
+                let message = e?.message || String(e);
+                if (serviceKey) {
+                    message = message.replaceAll(serviceKey, "[REDACTED]").replaceAll(encodeURIComponent(serviceKey), "[REDACTED]");
+                }
+                logger.error(`An error occurred while requesting: ${message}`);
+                return { content: [{ type: "text", text: `An error occurred while requesting: ${message}` }] };
             }
         }
     );

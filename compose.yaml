@@ -1,0 +1,11 @@
+services:
+  opendata-mcp:
+    build: .
+    image: opendata-mcp:local
+    restart: unless-stopped
+    environment:
+      PORT: "8787"
+      MCP_ALLOWED_HOSTS: "${MCP_ALLOWED_HOSTS:-mcp.ezrnd.co.kr}"
+      ODP_ALLOWED_HOSTS: "${ODP_ALLOWED_HOSTS:-apis.data.go.kr,api.odcloud.kr}"
+    expose:
+      - "8787"
