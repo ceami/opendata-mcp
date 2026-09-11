@@ -1,6 +1,4 @@
 ## Open Data MCP
-[![smithery badge](https://smithery.ai/badge/@iosif2/opendata-mcp)](https://smithery.ai/server/@iosif2/opendata-mcp)
-
 한국 공공데이터포털(OpenAPI)을 더 쉽게 탐색·호출할 수 있도록 돕는 Model Context Protocol(MCP) 서버입니다. 다음과 같은 MCP 도구를 제공합니다:
 
 - **search_api**: 키워드로 공공데이터 API를 검색
@@ -8,6 +6,33 @@
 - **fetch_data**: 표준 문서/메타데이터를 바탕으로 실제 OpenAPI 엔드포인트 호출
 
 내부적으로 검색/문서 도구는 `mcp.ezrnd.co.kr`(HTTPS) 백엔드를 사용합니다.
+
+### 원격 MCP 연결
+
+배포된 Streamable HTTP 엔드포인트는 `https://mcp.ezrnd.co.kr/mcp`입니다. MCP 클라이언트에서 이 URL을 연결하고, 공공데이터포털의 **디코딩된 원문 서비스 키**를 `x-odp-service-key` 헤더로 전달하세요.
+
+```json
+{
+  "mcpServers": {
+    "opendata": {
+      "url": "https://mcp.ezrnd.co.kr/mcp",
+      "headers": {
+        "x-odp-service-key": "<공공데이터포털_디코딩_서비스키>"
+      }
+    }
+  }
+}
+```
+
+### npx로 로컬 실행
+
+Node.js 환경에서는 별도 설치 없이 다음 명령으로 로컬 HTTP MCP 서버를 시작할 수 있습니다.
+
+```bash
+npx -y @aeriis-kr/opendata-mcp
+```
+
+기본 MCP 엔드포인트는 `http://127.0.0.1:8787/mcp`이며, 상태 확인 주소는 `http://127.0.0.1:8787/health`입니다. 포트를 바꾸려면 `PORT=18787 npx -y @aeriis-kr/opendata-mcp`처럼 실행하세요. 로컬 클라이언트에도 같은 `x-odp-service-key` 헤더를 설정합니다.
 
 ### 요구 사항
 - Docker 또는 Node.js 최신 LTS
@@ -34,7 +59,7 @@ docker compose ps
 Compose 파일은 프록시 네트워크를 지정하지 않습니다. 컨테이너를 프록시 네트워크에 연결한 뒤 `opendata-mcp:8787`의 `/mcp`로 프록시하세요.
 외부 공개 시 인증과 요청 빈도 제한은 리버스 프록시에서 적용하세요. 애플리케이션은 MCP 요청 본문을 1 MiB로 제한합니다.
 
-Smithery에는 공개 Streamable HTTP URL(예: `https://mcp.ezrnd.co.kr/mcp`)을 등록합니다. 기존 `smithery.yaml` 기반 호스팅과 구형 `@smithery/cli` 실행 경로는 사용하지 않습니다.
+Smithery에는 이 서버를 중복 호스팅하지 않고, 배포된 Streamable HTTP URL을 외부 서버로 등록합니다. 등록 명령은 `npx smithery mcp publish https://mcp.ezrnd.co.kr/mcp -n aeriis-kr/opendata-mcp`입니다.
 
 ### 설정
 - **PORT**: HTTP 포트. 기본값은 `8787`입니다.

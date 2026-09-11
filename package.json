@@ -1,16 +1,28 @@
 {
-	"name": "open-data-mcp",
-	"version": "1.0.1",
+	"name": "@aeriis-kr/opendata-mcp",
+	"version": "1.0.3",
 	"description": "",
-	"main": "build/http.js",
-	"module": "./src/index.ts",
+	"main": "./build/index.js",
+	"module": "./build/index.js",
 	"type": "module",
+  "bin": {
+    "opendata-mcp": "build/http.js"
+  },
+  "files": [
+    "build",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
 	"scripts": {
 		"dev": "tsx watch src/http.ts",
 		"build": "tsc",
 		"start": "node build/http.js",
 		"test": "node --import tsx --test test/*.test.ts",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+    "prepack": "npm run build"
 	},
 	"keywords": [],
 	"author": "",

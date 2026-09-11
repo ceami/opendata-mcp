@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * Copyright 2025 Team Aeris
  *
@@ -13,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { realpathSync } from "node:fs";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { pathToFileURL } from "node:url";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -121,7 +124,11 @@ export function createHttpServer({
     return httpServer;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+export function isMainModule(moduleUrl: string, entryPath: string | undefined) {
+    return entryPath !== undefined && moduleUrl === pathToFileURL(realpathSync(entryPath)).href;
+}
+
+if (isMainModule(import.meta.url, process.argv[1])) {
     const port = Number(process.env.PORT ?? 8787);
     if (!Number.isInteger(port) || port < 1 || port > 65535) {
         throw new Error("PORT must be an integer between 1 and 65535");
