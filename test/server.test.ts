@@ -6,6 +6,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { createHttpServer } from "../src/http.js";
 import { buildFetchRequest } from "../src/tools/fetch_data.js";
+import { safeJson } from "../src/utils.js";
 
 const endpointInfo = {
     path: "/items",
@@ -48,6 +49,14 @@ test("fetch_data never attaches the service key to redirectable non-standard aut
 
     assert.equal(request.redirect, "error");
     assert.deepEqual(request.headers, { "X-Authorization": "" });
+});
+
+test("safeJson bounds public API response bodies", async () => {
+    await assert.rejects(
+        () => safeJson(new Response("x".repeat(1_048_577)), 1_048_576),
+        /Public API response exceeds 1 MiB/,
+    );
+    assert.deepEqual(await safeJson(new Response('{"ok":true}'), 1_048_576), { ok: true });
 });
 
 test("Streamable HTTP serves health and the original three MCP tools", async () => {
